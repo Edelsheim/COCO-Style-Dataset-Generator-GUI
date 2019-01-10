@@ -16,7 +16,7 @@ if __name__=='__main__':
     ap.add_argument("-i", "--image_dir", required=True, help="Path to the image dir")
     ap.add_argument("-o", "--file_path", required=True, help="Path of output file")
     ap.add_argument("-c", "--class_file", required=True, help="Path of file with output classes")
-    ap.add_argument("-t", "--type", required=True, help="Type of the image files")
+    #ap.add_argument("-t", "--type", required=True, help="Type of the image files")
     args = vars(ap.parse_args())
 
     with open(args['class_file'], 'r') as f:
@@ -24,7 +24,9 @@ if __name__=='__main__':
         
     images, anns = [], []
 	
-    img_paths = [x for x in glob.glob(os.path.join(args['image_dir'], '*.'+args['type'])) if os.path.exists(x[:-3]+'txt')]
+    img_paths = [x for x in glob.glob(os.path.join(args['image_dir'], '*.jpg')) if os.path.exists(x[:-3]+'txt')]
+    img_paths_png = [x for x in glob.glob(os.path.join(args['image_dir'], '*.png')) if os.path.exists(x[:-3]+'txt')]
+    img_paths = img_paths + img_paths_png
 	
     num_imgs = len(img_paths)
     i=0
@@ -33,6 +35,7 @@ if __name__=='__main__':
         img = Image.open(f)
         width, height = img.size
         dic = {'file_name': f, 'id': i, 'height': height, 'width': width}
+        i = i + 1
         images.append(dic)
 
     ann_index = 0
@@ -79,7 +82,7 @@ if __name__=='__main__':
                         
             bbox = [x2, y2, x1, y1]
             dic2 = {'segmentation': poly, 'area': area, 'iscrowd':0, 'image_id':i, 'bbox':bbox, 'category_id': cat_id, 'id': ann_index}
-            ann_index+=1
+            ann_index = ann_index + 1
             ptr+=4
             anns.append(dic2)
           
