@@ -79,11 +79,15 @@ class COCO_dataset_generator(object):
         self.class_names = ('BG',) + tuple(self.class_names)
         
         self.img_paths = sorted(glob.glob(os.path.join(self.img_dir, '*.jpg')))
-        
-        if len(self.img_paths)==0:
-            self.img_paths = sorted(glob.glob(os.path.join(self.img_dir, '*.png')))
-        if os.path.exists(self.img_paths[self.index][:-3]+'txt'):
-            self.index = len(glob.glob(os.path.join(self.img_dir, '*.txt')))
+        self.img_paths = self.img_paths + sorted(glob.glob(os.path.join(self.img_dir, '*.png')))
+    
+        while(1):
+            if os.path.exists(self.img_paths[self.index][:-3]+'txt'):
+                self.index = self.index + 1
+                continue
+            else:
+                break
+
         self.checkpoint = self.index
         im = Image.open(self.img_paths[self.index])
         width, height = im.size
@@ -151,7 +155,7 @@ class COCO_dataset_generator(object):
                     self.existing_polys.append(Polygon(verts, closed=True, alpha=0.25, facecolor='red'))
             
         self.ax.imshow(image, aspect='auto')
-        
+        print("file name : {}".format(self.img_paths[self.index]))
         self.text+=str(self.index)+'\n'+os.path.abspath(self.img_paths[self.index])+'\n'+str(width)+' '+str(height)+'\n\n'
     
     def bring_prev(self, event):
@@ -235,10 +239,22 @@ class COCO_dataset_generator(object):
             self.index += 1
         else:
             exit()
-        
+
+        while(1):
+            if os.path.exists(self.img_paths[self.index][:-3]+'txt'):
+                self.index += 1
+                continue
+
+            if (self.index<len(self.img_paths)-1):
+                # self.index += 1
+                break
+            else:
+                print("file is end.")
+                exit()
+
         image = plt.imread(self.img_paths[self.index])
         self.ax.imshow(image, aspect='auto')
-        
+        print("file name : {}".format(self.img_paths[self.index]))
         im = Image.open(self.img_paths[self.index])
         width, height = im.size
         im.close()
